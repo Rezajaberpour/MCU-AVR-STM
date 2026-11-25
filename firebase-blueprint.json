@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "McuProjectRecord": {
+      "title": "MCU Project Record",
+      "description": "Saved microcontroller firmware, auto-generated prompt, optimization, or HW/SW co-analysis record.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the owner."
+        },
+        "title": {
+          "type": "string",
+          "description": "Project or snippet title."
+        },
+        "mcuFamily": {
+          "type": "string",
+          "enum": ["AVR", "STM32", "STM8", "HOLTEK"],
+          "description": "Target microcontroller family."
+        },
+        "mcuModel": {
+          "type": "string",
+          "description": "Specific MCU part number such as ATmega328P or STM32F103C8."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["CODE", "PROMPT", "CO_ANALYSIS", "OPTIMIZATION", "HMI"],
+          "description": "Workflow category."
+        },
+        "promptText": {
+          "type": "string",
+          "description": "Input specification or engineered prompt."
+        },
+        "codeOrResult": {
+          "type": "string",
+          "description": "Generated C/C++/Python code or AI reasoning output."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional engineering notes or toolchain details."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp on creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp on update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "mcuFamily",
+        "mcuModel",
+        "category",
+        "promptText",
+        "codeOrResult",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CircuitDiagnosticRecord": {
+      "title": "Circuit Diagnostic Record",
+      "description": "Saved schematic vision inspection, BOM recommendation, or technical standard report.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the owner."
+        },
+        "title": {
+          "type": "string",
+          "description": "Diagnostic report title."
+        },
+        "mcuFamily": {
+          "type": "string",
+          "enum": ["AVR", "STM32", "STM8", "HOLTEK", "GENERAL"],
+          "description": "Related MCU family or general electronics."
+        },
+        "diagnosticType": {
+          "type": "string",
+          "enum": ["SCHEMATIC_VISION", "STANDARDS_SEARCH", "COMPONENT_BOM"],
+          "description": "Type of engineering diagnostic."
+        },
+        "queryText": {
+          "type": "string",
+          "description": "User query or schematic prompt."
+        },
+        "analysisResult": {
+          "type": "string",
+          "description": "Detailed AI diagnostic or datasheet standard output."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp on creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp on update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "mcuFamily",
+        "diagnosticType",
+        "queryText",
+        "analysisResult",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/McuProjectRecord" },
+      "description": "User-owned saved MCU projects, generated firmware, prompts, and optimization analyses."
+    },
+    "/users/{userId}/diagnostics/{diagnosticId}": {
+      "schema": { "$ref": "#/entities/CircuitDiagnosticRecord" },
+      "description": "User-owned saved schematic vision analyses and technical database reports."
+    }
+  }
+}

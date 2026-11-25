@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">MCU Studio AI</string>
+    <string name="auth_title">استودیو هوشمند میکروکنترلر</string>
+    <string name="auth_subtitle">برنامه‌نویسی AVR، STM32، STM8 و Holtek، تحلیل شماتیک با جمنای، بهینه‌سازی مصرف انرژی و مانیتورینگ HMI</string>
+    <string name="auth_sign_in_google">ورود با حساب گوگل</string>
+    <string name="auth_cloud_note">برای همگام‌سازی پروژه‌ها، کدها و گزارش‌های تحلیل مدار در فضای ابری با حساب گوگل وارد شوید.</string>
+    <string name="nav_workbench">میز کار</string>
+    <string name="nav_code_lab">کد و ایجنت</string>
+    <string name="nav_schematic">تحلیل شماتیک</string>
+    <string name="nav_hmi">HMI و پایتون</string>
+    <string name="nav_standards">مرجع و آرشیو</string>
+    <string name="sign_out">خروج از حساب</string>
+    <string name="cd_hero_banner">بنر محیط مهندسی میکروکنترلر</string>
+    <string name="cd_schematic_banner">تصویر مرجع تحلیل شماتیک</string>
+    <string name="cd_user_uploaded_schematic">تصویر شماتیک یا برد بارگذاری‌شده</string>
+    <string name="cd_copy_code">کپی متن یا کد</string>
+    <string name="cd_save_cloud">ذخیره در فضای ابری</string>
+    <string name="cd_delete_item">حذف مورد</string>
+</resources>

@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidMcuProject(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.mcuFamily in ['AVR', 'STM32', 'STM8', 'HOLTEK'] &&
+             data.mcuModel is string && data.mcuModel.size() >= 1 && data.mcuModel.size() <= 60 &&
+             data.category in ['CODE', 'PROMPT', 'CO_ANALYSIS', 'OPTIMIZATION', 'HMI'] &&
+             data.promptText is string && data.promptText.size() <= 4000 &&
+             data.codeOrResult is string && data.codeOrResult.size() >= 1 && data.codeOrResult.size() <= 30000 &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000));
+    }
+
+    function isValidCircuitDiagnostic(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.mcuFamily in ['AVR', 'STM32', 'STM8', 'HOLTEK', 'GENERAL'] &&
+             data.diagnosticType in ['SCHEMATIC_VISION', 'STANDARDS_SEARCH', 'COMPONENT_BOM'] &&
+             data.queryText is string && data.queryText.size() >= 1 && data.queryText.size() <= 4000 &&
+             data.analysisResult is string && data.analysisResult.size() >= 1 && data.analysisResult.size() <= 30000;
+    }
+
+    match /users/{userId}/projects/{projectId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(projectId);
+      allow list: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(projectId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'title', 'mcuFamily', 'mcuModel',
+                         'category', 'promptText', 'codeOrResult',
+                         'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'title', 'mcuFamily', 'mcuModel',
+                         'category', 'promptText', 'codeOrResult',
+                         'notes', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       isValidMcuProject(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidMcuProject(incoming()) &&
+                       request.auth.uid == userId &&
+                       isValidId(projectId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'title', 'mcuFamily', 'mcuModel', 'category',
+                         'promptText', 'codeOrResult', 'notes', 'updatedAt'
+                       ]);
+
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(projectId);
+    }
+
+    match /users/{userId}/diagnostics/{diagnosticId} {
+      allow get: if isSignedIn() && request.auth.uid == userId && isValidId(diagnosticId);
+      allow list: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(diagnosticId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'title', 'mcuFamily', 'diagnosticType',
+                         'queryText', 'analysisResult', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'title', 'mcuFamily', 'diagnosticType',
+                         'queryText', 'analysisResult', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       isValidCircuitDiagnostic(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidCircuitDiagnostic(incoming()) &&
+                       request.auth.uid == userId &&
+                       isValidId(diagnosticId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp &&
+                       incoming().updatedAt <= request.time &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'title', 'mcuFamily', 'diagnosticType',
+                         'queryText', 'analysisResult', 'updatedAt'
+                       ]);
+
+      allow delete: if isSignedIn() && request.auth.uid == userId && isValidId(diagnosticId);
+    }
+  }
+}

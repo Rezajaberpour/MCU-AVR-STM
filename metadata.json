@@ -1,0 +1,6 @@
+{
+  "name": "MCU Studio AI",
+  "description": "محیط هوشمند برنامه‌نویسی میکروکنترلرهای AVR، STM32، STM8 و Holtek با هوش مصنوعی، تحلیل شماتیک، پرامپت‌نویسی خودکار و داشبورد HMI",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
